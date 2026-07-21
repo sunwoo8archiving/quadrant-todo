@@ -194,56 +194,21 @@
       </tbody>
     </table>
   </div>
-
-  <h2 style="font-size:15px;font-weight:600;margin:32px 0 12px">기준 설명</h2>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px">
-    <div>
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px"><span style="width:10px;height:10px;border-radius:2px;background:#2a78d6"></span><span style="font-size:13px;font-weight:600">중요도·영향력 기준</span></div>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <div><p style="font-size:12.5px;font-weight:600;margin:0 0 2px">파급 효과</p><p style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin:0">이 일을 끝내면 다른 일들이 얼마나 쉬워지거나 가능해지는지 (예: 다른 작업의 전제조건이 되는 일)</p></div>
-        <div><p style="font-size:12.5px;font-weight:600;margin:0 0 2px">되돌리기 어려운 정도</p><p style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin:0">나중에 고치기 힘든 결정일수록 먼저 처리하는 게 안전</p></div>
-        <div><p style="font-size:12.5px;font-weight:600;margin:0 0 2px">누구에게 영향을 주는가</p><p style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin:0">나만 관련된 일인지, 다른 사람이 기다리고 있는 일인지</p></div>
-      </div>
-    </div>
-    <div>
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px"><span style="width:10px;height:10px;border-radius:2px;background:#eb6834"></span><span style="font-size:13px;font-weight:600">에너지·심리적 기준</span></div>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <div><p style="font-size:12.5px;font-weight:600;margin:0 0 2px">저항감이 큰 일부터</p><p style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin:0">하기 싫은 일을 미룰수록 심리적 부담이 커지므로, 가장 하기 싫은 일을 먼저 처리하면(이른바 "개구리 먹기") 나머지가 가벼워짐</p></div>
-        <div><p style="font-size:12.5px;font-weight:600;margin:0 0 2px">지금의 에너지·집중력 수준에 맞는 일</p><p style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin:0">집중력이 높을 때는 어려운 일, 낮을 때는 단순 작업</p></div>
-        <div><p style="font-size:12.5px;font-weight:600;margin:0 0 2px">작은 성취감</p><p style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin:0">5~10분 안에 끝낼 수 있는 작은 일부터 처리해서 탄력을 받는 방법 (2분 규칙 등)</p></div>
-      </div>
-    </div>
-    <div>
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px"><span style="width:10px;height:10px;border-radius:2px;background:#1baf7a"></span><span style="font-size:13px;font-weight:600">자원·제약 기준</span></div>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <div><p style="font-size:12.5px;font-weight:600;margin:0 0 2px">필요한 도구·사람이 지금 확보되어 있는가</p><p style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin:0">남의 답변을 기다려야 하는 일은 먼저 요청부터 던져놓기</p></div>
-        <div><p style="font-size:12.5px;font-weight:600;margin:0 0 2px">소요 시간 대비 효과</p><p style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin:0">짧게 걸리는데 효과가 큰 일을 우선</p></div>
-      </div>
-    </div>
-    <div>
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px"><span style="width:10px;height:10px;border-radius:2px;background:#eda100"></span><span style="font-size:13px;font-weight:600">동기 부여 관점</span></div>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <div><p style="font-size:12.5px;font-weight:600;margin:0 0 2px">호기심·흥미</p><p style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin:0">하고 싶은 마음이 드는 일을 먼저 하면 관성이 생겨 다른 일도 이어서 하게 됨</p></div>
-        <div><p style="font-size:12.5px;font-weight:600;margin:0 0 2px">가치관과의 연결</p><p style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin:0">"왜 이 일이 나에게/조직에 의미가 있는가"를 떠올리면 시작하기 쉬움</p></div>
-        <div><p style="font-size:12.5px;font-weight:600;margin:0 0 2px">외부 책임감</p><p style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin:0">누군가에게 진행 상황을 공유하기로 했다면 그 압박이 동기가 됨</p></div>
-      </div>
-    </div>
-  </div>
 </main>
 
 <script>
 const items = [
-  {id:'ripple',cat:0,label:'파급 효과',x:-4.2,y:4.4,r:22,dir:'below'},
-  {id:'irrev',cat:0,label:'나중에 되돌리기 힘든 일',x:-5.5,y:3.6,r:19,dir:'left'},
-  {id:'resistance',cat:1,label:'저항감 큰 일부터',x:-3.4,y:2.9,r:20,dir:'below'},
-  {id:'whoaffects',cat:0,label:'누구에게 영향을 주는가',x:-1.6,y:1.8,r:17,dir:'below'},
-  {id:'resource',cat:2,label:'도구·사람 확보 여부',x:-0.2,y:0.4,r:17,dir:'below'},
-  {id:'accountability',cat:3,label:'외부 책임감',x:-1.8,y:-0.9,r:15,dir:'below'},
-  {id:'values',cat:3,label:'가치관과의 연결',x:1.6,y:0.4,r:19,dir:'above'},
-  {id:'timeval',cat:2,label:'소요 시간 대비 효과',x:3.3,y:0.4,r:19,dir:'below'},
-  {id:'energylevel',cat:1,label:'에너지 수준에 맞는 일',x:1.4,y:-0.9,r:17,dir:'right'},
-  {id:'curiosity',cat:3,label:'호기심·흥미',x:5.1,y:-0.9,r:17,dir:'below'},
-  {id:'smallwin',cat:1,label:'작은 성취감',x:5.4,y:-4.3,r:17,dir:'below'}
+  {id:'ripple',cat:0,label:'파급 효과',x:-4.2,y:4.4,r:22,dir:'below',desc:'이 일을 끝내면 다른 일들이 얼마나 쉬워지거나 가능해지는지 (예: 다른 작업의 전제조건이 되는 일)'},
+  {id:'irrev',cat:0,label:'나중에 되돌리기 힘든 일',x:-5.5,y:3.6,r:19,dir:'left',desc:'나중에 고치기 힘든 결정일수록 먼저 처리하는 게 안전'},
+  {id:'resistance',cat:1,label:'저항감 큰 일부터',x:-3.4,y:2.9,r:20,dir:'below',desc:'하기 싫은 일을 미룰수록 심리적 부담이 커지므로, 가장 하기 싫은 일을 먼저 처리하면(이른바 "개구리 먹기") 나머지가 가벼워짐'},
+  {id:'whoaffects',cat:0,label:'누구에게 영향을 주는가',x:-1.6,y:1.8,r:17,dir:'below',desc:'나만 관련된 일인지, 다른 사람이 기다리고 있는 일인지'},
+  {id:'resource',cat:2,label:'도구·사람 확보 여부',x:-0.2,y:0.4,r:17,dir:'below',desc:'남의 답변을 기다려야 하는 일은 먼저 요청부터 던져놓기'},
+  {id:'accountability',cat:3,label:'외부 책임감',x:-1.8,y:-0.9,r:15,dir:'below',desc:'누군가에게 진행 상황을 공유하기로 했다면 그 압박이 동기가 됨'},
+  {id:'values',cat:3,label:'가치관과의 연결',x:1.6,y:0.4,r:19,dir:'above',desc:'"왜 이 일이 나에게/조직에 의미가 있는가"를 떠올리면 시작하기 쉬움'},
+  {id:'timeval',cat:2,label:'소요 시간 대비 효과',x:3.3,y:0.4,r:19,dir:'below',desc:'짧게 걸리는데 효과가 큰 일을 우선'},
+  {id:'energylevel',cat:1,label:'에너지 수준에 맞는 일',x:1.4,y:-0.9,r:17,dir:'right',desc:'집중력이 높을 때는 어려운 일, 낮을 때는 단순 작업'},
+  {id:'curiosity',cat:3,label:'호기심·흥미',x:5.1,y:-0.9,r:17,dir:'below',desc:'하고 싶은 마음이 드는 일을 먼저 하면 관성이 생겨 다른 일도 이어서 하게 됨'},
+  {id:'smallwin',cat:1,label:'작은 성취감',x:5.4,y:-4.3,r:17,dir:'below',desc:'5~10분 안에 끝낼 수 있는 작은 일부터 처리해서 탄력을 받는 방법 (2분 규칙 등)'}
 ];
 const colors = ['#2a78d6','#eb6834','#1baf7a','#eda100'];
 const neonColors = ['#4fc3ff','#ff8a3d','#39ffb0','#ffe14d'];
@@ -332,6 +297,7 @@ function renderAccordion(){
       </div>
       ${open ? `
       <div style="padding:10px 12px;border-top:0.5px solid var(--border)">
+        ${it.desc ? `<p style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin:0 0 10px">${it.desc}</p>` : ''}
         ${list.length===0 ? `<p style="font-size:13px;color:var(--text-muted);margin:0 0 8px">아직 추가된 일이 없어요.</p>` : `
         <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px">
           ${list.map((t,i)=>`
