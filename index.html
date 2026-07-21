@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기준 사분면 &amp; 할 일 목록</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<style>
+  :root{
+    --text-primary:#1a1a1a;
+    --text-secondary:#555555;
+    --text-muted:#8a8a8a;
+    --border:#e2e2e2;
+    --border-strong:#c9c9c9;
+    --bg-accent:#eaf1fb;
+    --radius:8px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    padding:32px 16px 64px;
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    color:var(--text-primary);
+    background:#fff;
+  }
+  main{
+    max-width:680px;
+    margin:0 auto;
+  }
+  h1{
+    font-size:18px;
+    font-weight:600;
+    margin:0 0 20px;
+  }
+  .sr-only{
+    position:absolute;
+    width:1px;height:1px;
+    padding:0;margin:-1px;
+    overflow:hidden;
+    clip:rect(0,0,0,0);
+    white-space:nowrap;
+    border:0;
+  }
+  input[type="text"]{
+    font-family:inherit;
+    font-size:13px;
+    padding:8px 10px;
+    border:0.5px solid var(--border-strong);
+    border-radius:var(--radius);
+    outline:none;
+    color:var(--text-primary);
+  }
+  input[type="text"]:focus{
+    border-color:#2a78d6;
+  }
+  button{
+    font-family:inherit;
+    font-size:13px;
+    height:36px;
+    background:var(--text-primary);
+    color:#fff;
+    border:none;
+    border-radius:var(--radius);
+    cursor:pointer;
+  }
+  button:hover{
+    opacity:0.85;
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>기준 사분면 &amp; 할 일 목록</h1>
+
+  <h2 class="sr-only">사분면 그래프의 각 기준 원을 클릭하면 해당 기준에 속한 할 일 목록을 펼치고 접을 수 있는 토글 위젯</h2>
+  <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:8px;font-size:12px;color:var(--text-secondary)">
+    <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#2a78d6"></span>중요도·영향력</span>
+    <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#eb6834"></span>에너지·심리</span>
+    <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#1baf7a"></span>자원·제약</span>
+    <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#eda100"></span>동기 부여</span>
+  </div>
+  <svg width="100%" viewBox="0 0 640 460" id="quadSvg">
+    <line x1="320" y1="30" x2="320" y2="430" stroke="var(--border-strong)" stroke-width="1"/>
+    <line x1="20" y1="230" x2="620" y2="230" stroke="var(--border-strong)" stroke-width="1"/>
+    <text x="600" y="222" font-size="11" fill="var(--text-muted)" text-anchor="end">시작 용이성 →</text>
+    <text x="330" y="42" font-size="11" fill="var(--text-muted)">영향력 →</text>
+    <g id="bubbleLayer"></g>
+  </svg>
+  <div id="accordion" style="margin-top:8px"></div>
+</main>
+
+<script>
+const items = [
+  {id:'ripple',cat:0,label:'파급 효과',x:-3,y:4,r:16},
+  {id:'irrev',cat:0,label:'되돌리기 어려운 정도',x:-4,y:3.5,r:14},
+  {id:'whoaffects',cat:0,label:'누구에게 영향을 주는가',x:-1,y:2,r:12},
+  {id:'resistance',cat:1,label:'저항감 큰 일부터',x:-2.5,y:3,r:15},
+  {id:'energylevel',cat:1,label:'에너지 수준에 맞는 일',x:1,y:0.5,r:12},
+  {id:'smallwin',cat:1,label:'작은 성취감',x:3.5,y:-3,r:13},
+  {id:'resource',cat:2,label:'도구·사람 확보 여부',x:0,y:1,r:12},
+  {id:'timeval',cat:2,label:'소요 시간 대비 효과',x:1.5,y:1.5,r:13},
+  {id:'curiosity',cat:3,label:'호기심·흥미',x:3,y:0.5,r:13},
+  {id:'values',cat:3,label:'가치관과의 연결',x:1,y:1.5,r:12},
+  {id:'accountability',cat:3,label:'외부 책임감',x:-0.5,y:0,r:11}
+];
+const colors = ['#2a78d6','#eb6834','#1baf7a','#eda100'];
+const catBg = ['var(--bg-accent)','#fbe8de','#dff5ea','#fcf1d9'];
+const cx=320, cy=230, scale=26;
+const tasks = {};
+items.forEach(it => tasks[it.id] = []);
+let openId = null;
+
+function px(it){ return cx + it.x*scale; }
+function py(it){ return cy - it.y*scale; }
+
+function renderBubbles(){
+  const layer = document.getElementById('bubbleLayer');
+  layer.innerHTML = items.map(it => `
+    <g style="cursor:pointer" onclick="toggleItem('${it.id}')">
+      <circle cx="${px(it)}" cy="${py(it)}" r="${it.r}" fill="${colors[it.cat]}" opacity="${openId===it.id?1:0.85}" stroke="${openId===it.id?'var(--text-primary)':'none'}" stroke-width="1.5"/>
+      <text x="${px(it)}" y="${py(it)+it.r+13}" font-size="11" fill="var(--text-primary)" text-anchor="middle">${it.label}</text>
+    </g>`).join('');
+}
+
+function renderAccordion(){
+  const el = document.getElementById('accordion');
+  el.innerHTML = items.map(it => {
+    const open = openId===it.id;
+    const list = tasks[it.id];
+    return `
+    <div style="border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:6px;overflow:hidden">
+      <div onclick="toggleItem('${it.id}')" style="display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;background:${open?catBg[it.cat]:'transparent'}">
+        <span style="width:10px;height:10px;border-radius:50%;background:${colors[it.cat]};flex-shrink:0"></span>
+        <span style="font-size:13px;font-weight:500;flex:1">${it.label}</span>
+        <span style="font-size:12px;color:var(--text-muted)">${list.length}개</span>
+        <i class="ti ti-chevron-down" style="font-size:16px;color:var(--text-muted);transform:rotate(${open?180:0}deg);transition:transform .15s" aria-hidden="true"></i>
+      </div>
+      ${open ? `
+      <div style="padding:10px 12px;border-top:0.5px solid var(--border)">
+        ${list.length===0 ? `<p style="font-size:13px;color:var(--text-muted);margin:0 0 8px">아직 추가된 일이 없어요.</p>` : `
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px">
+          ${list.map((t,i)=>`
+            <div style="display:flex;align-items:center;gap:8px;font-size:13px">
+              <span style="flex:1">${t}</span>
+              <i class="ti ti-x" style="font-size:14px;color:var(--text-muted);cursor:pointer" aria-label="삭제" onclick="removeTask('${it.id}',${i})"></i>
+            </div>`).join('')}
+        </div>`}
+        <div style="display:flex;gap:6px">
+          <input type="text" id="input-${it.id}" placeholder="할 일 입력 후 추가" style="flex:1" onkeydown="if(event.key==='Enter')addTask('${it.id}')"/>
+          <button onclick="addTask('${it.id}')" style="padding:0 12px">추가</button>
+        </div>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function toggleItem(id){
+  openId = openId===id ? null : id;
+  renderBubbles();
+  renderAccordion();
+}
+function addTask(id){
+  const input = document.getElementById('input-'+id);
+  const v = input.value.trim();
+  if(!v) return;
+  tasks[id].push(v);
+  input.value='';
+  renderBubbles();
+  renderAccordion();
+  document.getElementById('input-'+id)?.focus();
+}
+function removeTask(id, idx){
+  tasks[id].splice(idx,1);
+  renderBubbles();
+  renderAccordion();
+}
+renderBubbles();
+renderAccordion();
+</script>
+</body>
+</html>
