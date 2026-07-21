@@ -66,6 +66,18 @@
   button:hover{
     opacity:0.85;
   }
+  .bubble-group{
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .bubble-group:hover{
+    animation: bubble-wiggle 0.4s ease-in-out;
+  }
+  @keyframes bubble-wiggle{
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-8deg); }
+    75% { transform: rotate(8deg); }
+  }
 </style>
 </head>
 <body>
@@ -274,7 +286,7 @@ function renderBubbles(){
               <circle cx="${px(it)}" cy="${py(it)}" r="${it.r+6}" fill="${fillColor}" opacity="1" filter="url(#glow2)"/>`;
     }
     return `
-    <g style="cursor:pointer" onclick="toggleItem('${it.id}')">
+    <g class="bubble-group" style="cursor:pointer" onclick="toggleItem('${it.id}')">
       ${halo}
       <circle cx="${px(it)}" cy="${py(it)}" r="${it.r}" fill="${fillColor}" opacity="${lit || openId===it.id ? 1 : 0.85}" stroke="${openId===it.id?'var(--text-primary)':'none'}" stroke-width="1.5"/>
       <text x="${lp.x}" y="${lp.y}" font-size="14" fill="var(--text-primary)" text-anchor="${lp.anchor}">${it.label}</text>
