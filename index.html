@@ -79,11 +79,14 @@
     <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#1baf7a"></span>자원·제약</span>
     <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#eda100"></span>동기 부여</span>
   </div>
-  <svg width="100%" viewBox="0 0 640 460" id="quadSvg">
-    <line x1="320" y1="30" x2="320" y2="430" stroke="var(--border-strong)" stroke-width="1"/>
-    <line x1="20" y1="230" x2="620" y2="230" stroke="var(--border-strong)" stroke-width="1"/>
-    <text x="600" y="222" font-size="11" fill="var(--text-muted)" text-anchor="end">시작 용이성 →</text>
-    <text x="330" y="42" font-size="11" fill="var(--text-muted)">영향력 →</text>
+  <svg width="100%" viewBox="0 0 760 560" id="quadSvg">
+    <line x1="380" y1="40" x2="380" y2="520" stroke="var(--border-strong)" stroke-width="1"/>
+    <line x1="40" y1="280" x2="720" y2="280" stroke="var(--border-strong)" stroke-width="1"/>
+    <text x="700" y="272" font-size="11" fill="var(--text-muted)" text-anchor="end">시작 용이성 →</text>
+    <text x="45" y="252" font-size="11" fill="var(--text-muted)" text-anchor="middle">↑</text>
+    <text x="45" y="266" font-size="11" fill="var(--text-muted)" text-anchor="middle">영</text>
+    <text x="45" y="280" font-size="11" fill="var(--text-muted)" text-anchor="middle">향</text>
+    <text x="45" y="294" font-size="11" fill="var(--text-muted)" text-anchor="middle">력</text>
     <g id="bubbleLayer"></g>
   </svg>
   <div id="accordion" style="margin-top:8px"></div>
@@ -91,21 +94,21 @@
 
 <script>
 const items = [
-  {id:'ripple',cat:0,label:'파급 효과',x:-3,y:4,r:16},
-  {id:'irrev',cat:0,label:'되돌리기 어려운 정도',x:-4,y:3.5,r:14},
-  {id:'whoaffects',cat:0,label:'누구에게 영향을 주는가',x:-1,y:2,r:12},
-  {id:'resistance',cat:1,label:'저항감 큰 일부터',x:-2.5,y:3,r:15},
-  {id:'energylevel',cat:1,label:'에너지 수준에 맞는 일',x:1,y:0.5,r:12},
-  {id:'smallwin',cat:1,label:'작은 성취감',x:3.5,y:-3,r:13},
-  {id:'resource',cat:2,label:'도구·사람 확보 여부',x:0,y:1,r:12},
-  {id:'timeval',cat:2,label:'소요 시간 대비 효과',x:1.5,y:1.5,r:13},
-  {id:'curiosity',cat:3,label:'호기심·흥미',x:3,y:0.5,r:13},
-  {id:'values',cat:3,label:'가치관과의 연결',x:1,y:1.5,r:12},
-  {id:'accountability',cat:3,label:'외부 책임감',x:-0.5,y:0,r:11}
+  {id:'ripple',cat:0,label:'파급 효과',x:-4,y:4.5,r:16},
+  {id:'irrev',cat:0,label:'되돌리기 어려운 정도',x:-1.5,y:3.5,r:14},
+  {id:'whoaffects',cat:0,label:'누구에게 영향을 주는가',x:2.5,y:4.5,r:12},
+  {id:'resistance',cat:1,label:'저항감 큰 일부터',x:-4,y:1,r:15},
+  {id:'energylevel',cat:1,label:'에너지 수준에 맞는 일',x:-1,y:-1.5,r:12},
+  {id:'smallwin',cat:1,label:'작은 성취감',x:4.5,y:-4,r:13},
+  {id:'resource',cat:2,label:'도구·사람 확보 여부',x:-4,y:-3.5,r:12},
+  {id:'timeval',cat:2,label:'소요 시간 대비 효과',x:1,y:1.5,r:13},
+  {id:'curiosity',cat:3,label:'호기심·흥미',x:4.5,y:1.5,r:13},
+  {id:'values',cat:3,label:'가치관과의 연결',x:1.5,y:-3,r:12},
+  {id:'accountability',cat:3,label:'외부 책임감',x:-1.5,y:1,r:11}
 ];
 const colors = ['#2a78d6','#eb6834','#1baf7a','#eda100'];
 const catBg = ['var(--bg-accent)','#fbe8de','#dff5ea','#fcf1d9'];
-const cx=320, cy=230, scale=26;
+const cx=380, cy=280, scale=40;
 const STORAGE_KEY = 'quadrant-todo:tasks';
 const tasks = {};
 items.forEach(it => tasks[it.id] = []);
