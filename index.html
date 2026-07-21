@@ -79,6 +79,7 @@
     <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#1baf7a"></span>자원·제약</span>
     <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#eda100"></span>동기 부여</span>
   </div>
+  <p style="font-size:11px;color:var(--text-muted);margin:0 0 12px">사용 설명서 — 원을 클릭해 할 일을 추가해 보세요. 할 일이 1개 이상이면 옅게, 5개 이상이면 더 밝게, 10개 이상이면 가장 밝게 빛나요.</p>
   <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">
     <svg width="100%" viewBox="0 0 900 500" id="quadSvg" style="flex:1 1 540px;min-width:300px">
       <line x1="540" y1="6" x2="540" y2="480" stroke="var(--border-strong)" stroke-width="1"/>
@@ -92,6 +93,23 @@
         <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
           <feGaussianBlur stdDeviation="4.5" result="blur"/>
           <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        <filter id="glow2" x="-90%" y="-90%" width="280%" height="280%">
+          <feGaussianBlur stdDeviation="7" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        <filter id="glow3" x="-120%" y="-120%" width="340%" height="340%">
+          <feGaussianBlur stdDeviation="10" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
             <feMergeNode in="blur"/>
             <feMergeNode in="blur"/>
             <feMergeNode in="SourceGraphic"/>
@@ -172,6 +190,21 @@ const items = [
 const colors = ['#2a78d6','#eb6834','#1baf7a','#eda100'];
 const neonColors = ['#4fc3ff','#ff8a3d','#39ffb0','#ffe14d'];
 const catBg = ['var(--bg-accent)','#fbe8de','#dff5ea','#fcf1d9'];
+
+function lighten(hex, amt){
+  const num = parseInt(hex.slice(1), 16);
+  let r = (num>>16)&255, g = (num>>8)&255, b = num&255;
+  r = Math.round(r + (255-r)*amt);
+  g = Math.round(g + (255-g)*amt);
+  b = Math.round(b + (255-b)*amt);
+  return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
+}
+function glowLevel(count){
+  if(count >= 10) return 3;
+  if(count >= 5) return 2;
+  if(count >= 1) return 1;
+  return 0;
+}
 const cx=540, cy=240, scaleX=52, scaleY=44;
 const STORAGE_KEY = 'quadrant-todo:tasks';
 const tasks = {};
@@ -202,11 +235,24 @@ function renderBubbles(){
   const layer = document.getElementById('bubbleLayer');
   layer.innerHTML = items.map(it => {
     const lp = labelPos(it);
-    const lit = tasks[it.id].length > 0;
-    const fillColor = lit ? neonColors[it.cat] : colors[it.cat];
+    const count = tasks[it.id].length;
+    const level = glowLevel(count);
+    const lit = level > 0;
+    const baseNeon = lit ? neonColors[it.cat] : colors[it.cat];
+    const fillColor = level === 3 ? lighten(baseNeon, 0.4) : level === 2 ? lighten(baseNeon, 0.18) : baseNeon;
+    const glowFilter = level === 3 ? 'glow3' : level === 2 ? 'glow2' : 'glow';
+    let halo = '';
+    if(level === 1){
+      halo = `<circle cx="${px(it)}" cy="${py(it)}" r="${it.r+3}" fill="${fillColor}" opacity="0.9" filter="url(#glow)"/>`;
+    } else if(level === 2){
+      halo = `<circle cx="${px(it)}" cy="${py(it)}" r="${it.r+6}" fill="${fillColor}" opacity="0.95" filter="url(#glow2)"/>`;
+    } else if(level === 3){
+      halo = `<circle cx="${px(it)}" cy="${py(it)}" r="${it.r+12}" fill="${fillColor}" opacity="0.85" filter="url(#glow3)"/>
+              <circle cx="${px(it)}" cy="${py(it)}" r="${it.r+6}" fill="${fillColor}" opacity="1" filter="url(#glow2)"/>`;
+    }
     return `
     <g style="cursor:pointer" onclick="toggleItem('${it.id}')">
-      ${lit ? `<circle cx="${px(it)}" cy="${py(it)}" r="${it.r+3}" fill="${fillColor}" opacity="0.9" filter="url(#glow)"/>` : ''}
+      ${halo}
       <circle cx="${px(it)}" cy="${py(it)}" r="${it.r}" fill="${fillColor}" opacity="${lit || openId===it.id ? 1 : 0.85}" stroke="${openId===it.id?'var(--text-primary)':(lit?'#fff':'none')}" stroke-width="${openId===it.id?1.5:(lit?2:1.5)}"/>
       <text x="${lp.x}" y="${lp.y}" font-size="14" fill="var(--text-primary)" text-anchor="${lp.anchor}">${it.label}</text>
     </g>`;
