@@ -28,8 +28,8 @@
     margin:0 auto;
   }
   h1{
-    font-size:18px;
-    font-weight:600;
+    font-size:26px;
+    font-weight:700;
     margin:0 0 20px;
   }
   .sr-only{
@@ -81,14 +81,14 @@
   </div>
   <p style="font-size:11px;color:var(--text-muted);margin:0 0 28px">할 일을 해당하는 원에 작성해보세요. 할 일이 1개 이상이면 옅게, 5개 이상이면 더 밝게, 10개 이상이면 가장 밝게 빛나요.</p>
   <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">
-    <svg width="100%" viewBox="0 0 900 500" id="quadSvg" style="flex:1 1 540px;min-width:300px">
-      <line x1="540" y1="6" x2="540" y2="480" stroke="var(--border-strong)" stroke-width="1"/>
-      <line x1="10" y1="240" x2="890" y2="240" stroke="var(--border-strong)" stroke-width="1"/>
-      <text x="885" y="258" font-size="11" fill="var(--text-muted)" text-anchor="end">시작 용이성 →</text>
-      <text x="515" y="22" font-size="11" fill="var(--text-muted)" text-anchor="middle">↑</text>
-      <text x="515" y="36" font-size="11" fill="var(--text-muted)" text-anchor="middle">영</text>
-      <text x="515" y="50" font-size="11" fill="var(--text-muted)" text-anchor="middle">향</text>
-      <text x="515" y="64" font-size="11" fill="var(--text-muted)" text-anchor="middle">력</text>
+    <svg width="100%" viewBox="0 0 820 500" id="quadSvg" style="flex:1 1 540px;min-width:300px">
+      <line x1="460" y1="6" x2="460" y2="480" stroke="var(--border-strong)" stroke-width="1"/>
+      <line x1="10" y1="240" x2="810" y2="240" stroke="var(--border-strong)" stroke-width="1"/>
+      <text x="805" y="258" font-size="11" fill="var(--text-muted)" text-anchor="end">시작 용이성 →</text>
+      <text x="435" y="22" font-size="11" fill="var(--text-muted)" text-anchor="middle">↑</text>
+      <text x="435" y="36" font-size="11" fill="var(--text-muted)" text-anchor="middle">영</text>
+      <text x="435" y="50" font-size="11" fill="var(--text-muted)" text-anchor="middle">향</text>
+      <text x="435" y="64" font-size="11" fill="var(--text-muted)" text-anchor="middle">력</text>
       <defs>
         <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
           <feGaussianBlur stdDeviation="4.5" result="blur"/>
@@ -205,7 +205,7 @@ function glowLevel(count){
   if(count >= 1) return 1;
   return 0;
 }
-const cx=540, cy=240, scaleX=52, scaleY=44;
+const cx=460, cy=240, scaleX=52, scaleY=44;
 const STORAGE_KEY = 'quadrant-todo:tasks';
 const tasks = {};
 items.forEach(it => tasks[it.id] = []);
