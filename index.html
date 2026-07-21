@@ -262,7 +262,7 @@ function renderBubbles(){
     const level = glowLevel(count);
     const lit = level > 0;
     const baseNeon = lit ? neonColors[it.cat] : colors[it.cat];
-    const fillColor = level === 3 ? lighten(baseNeon, 0.4) : level === 2 ? lighten(baseNeon, 0.18) : baseNeon;
+    const fillColor = level === 3 ? lighten(baseNeon, 0.45) : level === 2 ? lighten(baseNeon, 0.25) : level === 1 ? lighten(baseNeon, 0.1) : baseNeon;
     const glowFilter = level === 3 ? 'glow3' : level === 2 ? 'glow2' : 'glow';
     let halo = '';
     if(level === 1){
