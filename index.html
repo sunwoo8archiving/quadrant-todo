@@ -106,8 +106,16 @@ const items = [
 const colors = ['#2a78d6','#eb6834','#1baf7a','#eda100'];
 const catBg = ['var(--bg-accent)','#fbe8de','#dff5ea','#fcf1d9'];
 const cx=320, cy=230, scale=26;
+const STORAGE_KEY = 'quadrant-todo:tasks';
 const tasks = {};
 items.forEach(it => tasks[it.id] = []);
+try{
+  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  Object.keys(saved).forEach(id => { if(tasks[id]) tasks[id] = saved[id]; });
+}catch(e){}
+function persist(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); }catch(e){}
+}
 let openId = null;
 
 function px(it){ return cx + it.x*scale; }
@@ -164,6 +172,7 @@ function addTask(id){
   const v = input.value.trim();
   if(!v) return;
   tasks[id].push(v);
+  persist();
   input.value='';
   renderBubbles();
   renderAccordion();
@@ -171,6 +180,7 @@ function addTask(id){
 }
 function removeTask(id, idx){
   tasks[id].splice(idx,1);
+  persist();
   renderBubbles();
   renderAccordion();
 }
