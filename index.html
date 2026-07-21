@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>기준 사분면 &amp; 할 일 목록</title>
+<title>내가 정말 하기 싫어 미쳐버릴 때 도움이 될 사이트</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
 <style>
   :root{
@@ -70,7 +70,7 @@
 </head>
 <body>
 <main>
-  <h1>기준 사분면 &amp; 할 일 목록</h1>
+  <h1>내가 정말 하기 싫어 미쳐버릴 때 도움이 될 사이트</h1>
 
   <h2 class="sr-only">사분면 그래프의 각 기준 원을 클릭하면 해당 기준에 속한 할 일 목록을 펼치고 접을 수 있는 토글 위젯</h2>
   <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:8px;font-size:12px;color:var(--text-secondary)">
@@ -117,6 +117,7 @@ const items = [
   {id:'smallwin',cat:1,label:'작은 성취감',x:5.4,y:-4.3,r:17,dir:'below'}
 ];
 const colors = ['#2a78d6','#eb6834','#1baf7a','#eda100'];
+const neonColors = ['#4fc3ff','#ff8a3d','#39ffb0','#ffe14d'];
 const catBg = ['var(--bg-accent)','#fbe8de','#dff5ea','#fcf1d9'];
 const cx=540, cy=240, scaleX=52, scaleY=44;
 const STORAGE_KEY = 'quadrant-todo:tasks';
@@ -149,10 +150,11 @@ function renderBubbles(){
   layer.innerHTML = items.map(it => {
     const lp = labelPos(it);
     const lit = tasks[it.id].length > 0;
+    const fillColor = lit ? neonColors[it.cat] : colors[it.cat];
     return `
     <g style="cursor:pointer" onclick="toggleItem('${it.id}')">
-      ${lit ? `<circle cx="${px(it)}" cy="${py(it)}" r="${it.r+3}" fill="${colors[it.cat]}" opacity="0.9" filter="url(#glow)"/>` : ''}
-      <circle cx="${px(it)}" cy="${py(it)}" r="${it.r}" fill="${colors[it.cat]}" opacity="${lit || openId===it.id ? 1 : 0.85}" stroke="${openId===it.id?'var(--text-primary)':(lit?'#fff':'none')}" stroke-width="${openId===it.id?1.5:(lit?2:1.5)}"/>
+      ${lit ? `<circle cx="${px(it)}" cy="${py(it)}" r="${it.r+3}" fill="${fillColor}" opacity="0.9" filter="url(#glow)"/>` : ''}
+      <circle cx="${px(it)}" cy="${py(it)}" r="${it.r}" fill="${fillColor}" opacity="${lit || openId===it.id ? 1 : 0.85}" stroke="${openId===it.id?'var(--text-primary)':(lit?'#fff':'none')}" stroke-width="${openId===it.id?1.5:(lit?2:1.5)}"/>
       <text x="${lp.x}" y="${lp.y}" font-size="14" fill="var(--text-primary)" text-anchor="${lp.anchor}">${it.label}</text>
     </g>`;
   }).join('');
