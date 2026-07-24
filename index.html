@@ -91,8 +91,14 @@
     font-size:12px;
     color:var(--text-primary);
   }
-  .bubble-group.drag-target circle:first-of-type{
-    opacity:1;
+  .tag-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:2px 8px;
+    border-radius:999px;
+    font-size:11px;
+    white-space:nowrap;
   }
 </style>
 </head>
@@ -210,6 +216,19 @@
   </div>
   </div>
   <div id="dragBlocks" style="flex:1;min-width:240px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);gap:10px"></div>
+  </div>
+
+  <h2 style="font-size:15px;font-weight:600;margin:32px 0 12px">담아둔 할 일 모아보기</h2>
+  <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead>
+        <tr>
+          <th style="text-align:left;padding:8px 10px;border-bottom:1px solid var(--border-strong);color:var(--text-secondary);font-weight:600;white-space:nowrap">태그</th>
+          <th style="text-align:left;padding:8px 10px;border-bottom:1px solid var(--border-strong);color:var(--text-secondary);font-weight:600">할 일</th>
+        </tr>
+      </thead>
+      <tbody id="taskLogBody"></tbody>
+    </table>
   </div>
 </main>
 
@@ -346,6 +365,7 @@ function addTask(id){
   input.value='';
   renderBubbles();
   renderAccordion();
+  renderTaskLog();
   document.getElementById('input-'+id)?.focus();
 }
 function removeTask(id, idx){
@@ -353,6 +373,25 @@ function removeTask(id, idx){
   persist();
   renderBubbles();
   renderAccordion();
+  renderTaskLog();
+}
+function renderTaskLog(){
+  const body = document.getElementById('taskLogBody');
+  const rows = [];
+  items.forEach(it => {
+    tasks[it.id].forEach(t => rows.push({label: it.label, cat: it.cat, text: t}));
+  });
+  if(rows.length === 0){
+    body.innerHTML = `<tr><td colspan="2" style="padding:10px;color:var(--text-muted);font-size:13px">아직 담긴 할 일이 없어요.</td></tr>`;
+    return;
+  }
+  body.innerHTML = rows.map(r => `
+    <tr>
+      <td style="padding:8px 10px;border-bottom:0.5px solid var(--border)">
+        <span class="tag-pill" style="background:${catBg[r.cat]}"><span style="width:6px;height:6px;border-radius:50%;background:${colors[r.cat]}"></span>${r.label}</span>
+      </td>
+      <td style="padding:8px 10px;border-bottom:0.5px solid var(--border)">${r.text}</td>
+    </tr>`).join('');
 }
 
 function renderDragBlocks(){
@@ -375,27 +414,57 @@ function renderDragBlocks(){
 renderDragBlocks();
 
 const bubbleLayer = document.getElementById('bubbleLayer');
+const dragScale = {};
+items.forEach(it => dragScale[it.id] = {cur:1, target:1});
+
+function flyIntoCircle(sourceEl, targetEl){
+  const startRect = sourceEl.getBoundingClientRect();
+  const endRect = targetEl.getBoundingClientRect();
+  const ghost = sourceEl.cloneNode(true);
+  ghost.querySelectorAll('textarea').forEach(t => { t.disabled = true; });
+  Object.assign(ghost.style, {
+    position:'fixed', left:startRect.left+'px', top:startRect.top+'px',
+    width:startRect.width+'px', height:startRect.height+'px', margin:'0',
+    zIndex:9999, pointerEvents:'none',
+    transition:'transform 0.45s cubic-bezier(.4,0,.2,1), opacity 0.45s ease'
+  });
+  document.body.appendChild(ghost);
+  const dx = (endRect.left + endRect.width/2) - (startRect.left + startRect.width/2);
+  const dy = (endRect.top + endRect.height/2) - (startRect.top + startRect.height/2);
+  requestAnimationFrame(() => {
+    ghost.style.transform = `translate(${dx}px, ${dy}px) scale(0.05)`;
+    ghost.style.opacity = '0';
+  });
+  setTimeout(() => ghost.remove(), 480);
+}
+
 bubbleLayer.addEventListener('dragover', e => {
   const g = e.target.closest('.bubble-group');
-  if(g){ e.preventDefault(); g.classList.add('drag-target'); }
+  if(g){ e.preventDefault(); g.classList.add('drag-target'); dragScale[g.dataset.id].target = 1.18; }
 });
 bubbleLayer.addEventListener('dragleave', e => {
   const g = e.target.closest('.bubble-group');
-  if(g) g.classList.remove('drag-target');
+  if(g){ g.classList.remove('drag-target'); dragScale[g.dataset.id].target = 1; }
 });
 bubbleLayer.addEventListener('drop', e => {
   const g = e.target.closest('.bubble-group');
   if(!g) return;
   e.preventDefault();
   g.classList.remove('drag-target');
+  dragScale[g.dataset.id].target = 1;
   const text = e.dataTransfer.getData('text/plain');
   const blockId = e.dataTransfer.getData('application/x-block-id');
   if(!text) return;
   const id = g.dataset.id;
+  if(blockId !== ''){
+    const block = document.querySelector('.drag-block[data-block="'+blockId+'"]');
+    if(block) flyIntoCircle(block, g);
+  }
   tasks[id].push(text);
   persist();
   renderBubbles();
   renderAccordion();
+  renderTaskLog();
   if(blockId !== ''){
     const ta = document.querySelector('textarea[data-block="'+blockId+'"]');
     if(ta) ta.value = '';
@@ -422,16 +491,19 @@ function wiggleLoop(t){
   lastWiggleT = t;
   const k = 50, c = 4.5;
   document.querySelectorAll('.bubble-group').forEach(el => {
-    const w = wiggle[el.dataset.id];
-    if(!w) return;
+    const id = el.dataset.id;
+    const w = wiggle[id];
+    const s = dragScale[id];
+    if(!w || !s) return;
     if(Math.abs(w.angle) < 0.01 && Math.abs(w.vel) < 0.01){
       w.angle = 0; w.vel = 0;
-      el.style.transform = '';
     } else {
       w.vel += (-k*w.angle - c*w.vel) * dt;
       w.angle += w.vel * dt;
-      el.style.transform = `rotate(${w.angle.toFixed(2)}deg)`;
     }
+    s.cur += (s.target - s.cur) * 0.25;
+    const showScale = Math.abs(s.cur - 1) > 0.001;
+    el.style.transform = (showScale ? `scale(${s.cur.toFixed(3)}) ` : '') + `rotate(${w.angle.toFixed(2)}deg)`;
   });
   requestAnimationFrame(wiggleLoop);
 }
@@ -439,6 +511,7 @@ requestAnimationFrame(wiggleLoop);
 
 renderBubbles();
 renderAccordion();
+renderTaskLog();
 </script>
 </body>
 </html>
