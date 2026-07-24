@@ -70,13 +70,29 @@
     transform-box: fill-box;
     transform-origin: center;
   }
-  .bubble-group:hover{
-    animation: bubble-wiggle 0.4s ease-in-out;
+  .drag-block{
+    border:1px solid var(--border-strong);
+    border-radius:var(--radius);
+    padding:8px;
+    cursor:grab;
+    background:#fff;
+    display:flex;
   }
-  @keyframes bubble-wiggle{
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-8deg); }
-    75% { transform: rotate(8deg); }
+  .drag-block:active{
+    cursor:grabbing;
+  }
+  .drag-block textarea{
+    flex:1;
+    border:none;
+    resize:none;
+    outline:none;
+    background:transparent;
+    font-family:inherit;
+    font-size:12px;
+    color:var(--text-primary);
+  }
+  .bubble-group.drag-target circle:first-of-type{
+    opacity:1;
   }
 </style>
 </head>
@@ -193,20 +209,7 @@
     </div>
   </div>
   </div>
-  <div style="flex:1;min-width:240px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);gap:10px">
-    <div style="border:1px dashed var(--border-strong);border-radius:var(--radius)"></div>
-    <div style="border:1px dashed var(--border-strong);border-radius:var(--radius)"></div>
-    <div style="border:1px dashed var(--border-strong);border-radius:var(--radius)"></div>
-    <div style="border:1px dashed var(--border-strong);border-radius:var(--radius)"></div>
-    <div style="border:1px dashed var(--border-strong);border-radius:var(--radius)"></div>
-    <div style="border:1px dashed var(--border-strong);border-radius:var(--radius)"></div>
-    <div style="border:1px dashed var(--border-strong);border-radius:var(--radius)"></div>
-    <div style="border:1px dashed var(--border-strong);border-radius:var(--radius)"></div>
-    <div style="border:1px dashed var(--border-strong);border-radius:var(--radius)"></div>
-    <div style="border:1px dashed var(--border-strong);border-radius:var(--radius)"></div>
-    <div style="border:1px dashed var(--border-strong);border-radius:var(--radius)"></div>
-    <div style="border:1px dashed var(--border-strong);border-radius:var(--radius)"></div>
-  </div>
+  <div id="dragBlocks" style="flex:1;min-width:240px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);gap:10px"></div>
   </div>
 </main>
 
@@ -288,7 +291,7 @@ function renderBubbles(){
               <circle cx="${px(it)}" cy="${py(it)}" r="${it.r+6}" fill="${fillColor}" opacity="1" filter="url(#glow2)"/>`;
     }
     return `
-    <g class="bubble-group" style="cursor:pointer" onclick="toggleItem('${it.id}')">
+    <g class="bubble-group" data-id="${it.id}" style="cursor:pointer" onclick="toggleItem('${it.id}')">
       ${halo}
       <circle cx="${px(it)}" cy="${py(it)}" r="${it.r}" fill="${fillColor}" opacity="${lit || openId===it.id ? 1 : 0.85}" stroke="${openId===it.id?'var(--text-primary)':'none'}" stroke-width="1.5"/>
       <text x="${lp.x}" y="${lp.y}" font-size="14" fill="var(--text-primary)" text-anchor="${lp.anchor}">${it.label}</text>
@@ -351,6 +354,89 @@ function removeTask(id, idx){
   renderBubbles();
   renderAccordion();
 }
+
+function renderDragBlocks(){
+  const el = document.getElementById('dragBlocks');
+  el.innerHTML = Array.from({length:12}).map((_,i) => `
+    <div class="drag-block" draggable="true" data-block="${i}">
+      <textarea data-block="${i}" placeholder="할 일을 적고 원으로 드래그" rows="2"></textarea>
+    </div>`).join('');
+  el.querySelectorAll('.drag-block').forEach(block => {
+    block.addEventListener('dragstart', e => {
+      const ta = block.querySelector('textarea');
+      const text = ta.value.trim();
+      if(!text){ e.preventDefault(); return; }
+      e.dataTransfer.setData('text/plain', text);
+      e.dataTransfer.setData('application/x-block-id', block.dataset.block);
+      e.dataTransfer.effectAllowed = 'move';
+    });
+  });
+}
+renderDragBlocks();
+
+const bubbleLayer = document.getElementById('bubbleLayer');
+bubbleLayer.addEventListener('dragover', e => {
+  const g = e.target.closest('.bubble-group');
+  if(g){ e.preventDefault(); g.classList.add('drag-target'); }
+});
+bubbleLayer.addEventListener('dragleave', e => {
+  const g = e.target.closest('.bubble-group');
+  if(g) g.classList.remove('drag-target');
+});
+bubbleLayer.addEventListener('drop', e => {
+  const g = e.target.closest('.bubble-group');
+  if(!g) return;
+  e.preventDefault();
+  g.classList.remove('drag-target');
+  const text = e.dataTransfer.getData('text/plain');
+  const blockId = e.dataTransfer.getData('application/x-block-id');
+  if(!text) return;
+  const id = g.dataset.id;
+  tasks[id].push(text);
+  persist();
+  renderBubbles();
+  renderAccordion();
+  if(blockId !== ''){
+    const ta = document.querySelector('textarea[data-block="'+blockId+'"]');
+    if(ta) ta.value = '';
+  }
+});
+
+const wiggle = {};
+items.forEach(it => wiggle[it.id] = {angle:0, vel:0});
+function kickWiggle(id){
+  const w = wiggle[id];
+  if(!w) return;
+  w.vel += (Math.random() > 0.5 ? 1 : -1) * 100;
+}
+bubbleLayer.addEventListener('mouseover', e => {
+  const g = e.target.closest('.bubble-group');
+  if(!g) return;
+  const related = e.relatedTarget && e.relatedTarget.closest ? e.relatedTarget.closest('.bubble-group') : null;
+  if(related === g) return;
+  kickWiggle(g.dataset.id);
+});
+let lastWiggleT = performance.now();
+function wiggleLoop(t){
+  const dt = Math.min((t - lastWiggleT) / 1000, 0.05);
+  lastWiggleT = t;
+  const k = 50, c = 4.5;
+  document.querySelectorAll('.bubble-group').forEach(el => {
+    const w = wiggle[el.dataset.id];
+    if(!w) return;
+    if(Math.abs(w.angle) < 0.01 && Math.abs(w.vel) < 0.01){
+      w.angle = 0; w.vel = 0;
+      el.style.transform = '';
+    } else {
+      w.vel += (-k*w.angle - c*w.vel) * dt;
+      w.angle += w.vel * dt;
+      el.style.transform = `rotate(${w.angle.toFixed(2)}deg)`;
+    }
+  });
+  requestAnimationFrame(wiggleLoop);
+}
+requestAnimationFrame(wiggleLoop);
+
 renderBubbles();
 renderAccordion();
 </script>
